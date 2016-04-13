@@ -28,8 +28,8 @@ method calculate-shortest-filter-length(Int:D :$num-keys, Rat:D :$error-rate -->
     my Num $lowest-m;
     my Int $best-k = 1;
 
-    for 1 .. 100 -> $k {
-        my $m = (-1 * $k * $num-keys) / (log(1 - ($error-rate ** (1/$k))));
+    for 1 ... 100 -> $k {
+        my $m = (-1 * $k * $num-keys) / (log(1 - ($error-rate ** (1 / $k))));
 
         if (!$lowest-m.defined || ($m < $lowest-m)) {
             $lowest-m = $m;
