@@ -89,7 +89,7 @@ method add(Mu:D: Any:D $key) {
     );
 }
 
-method check(Mu:D: Any:D $key) {
+method check(Mu:D: Any:D $key --> Bool) {
     so $!filter[
         self.get-cells(
             $key,
