@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/yowcow/p6-Algorithm-BloomFilter.svg?branch=master)](https://travis-ci.org/yowcow/p6-Algorithm-BloomFilter)
+
 NAME
 ====
 
