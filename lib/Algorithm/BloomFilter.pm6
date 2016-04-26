@@ -1,4 +1,7 @@
 use v6;
+use experimental :pack;
+use Digest::SHA;
+
 unit class Algorithm::BloomFilter;
 
 has Rat $.error-rate;
@@ -8,7 +11,7 @@ has Int $.filter-length;
 has Int $.num-hash-funcs;
 has Num @.salts;
 has Buf $.filter;
-has Buf $.blankvec;
+has Int $.blankvec;
 
 method BUILD(Rat:D :$!error-rate, Int:D :$!capacity) {
     my %filter-settings = self.calculate-shortest-filter-length(
@@ -18,10 +21,13 @@ method BUILD(Rat:D :$!error-rate, Int:D :$!capacity) {
     $!key-count      = 0;
     $!filter-length  = %filter-settings<length>;
     $!num-hash-funcs = %filter-settings<num-hash-funcs>;
-    @!salts          = self.create-salts($!num-hash-funcs);
+    @!salts          = self.create-salts(count => $!num-hash-funcs);
 
-    #XXX TODO: Make an empty filter
-    #XXX TODO: Make blank vectors
+    # Create an empty filter
+    $!filter = Buf.new((for 1 .. $!filter-length { 0 }));
+
+    # Create a blank vector
+    $!blankvec = 0;
 }
 
 method calculate-shortest-filter-length(Int:D :$num-keys, Rat:D :$error-rate --> Hash[Int]) {
@@ -42,7 +48,7 @@ method calculate-shortest-filter-length(Int:D :$num-keys, Rat:D :$error-rate -->
         num-hash-funcs => $best-k;
 }
 
-method create-salts(Int:D $count --> Array[Num]) {
+method create-salts(Int:D :$count --> Array[Num]) {
     my Num %collisions;
 
     while %collisions.keys.elems < $count {
@@ -52,6 +58,48 @@ method create-salts(Int:D $count --> Array[Num]) {
 
     my Num @array = %collisions.values;
 }
+
+method get-cells(Any:D $key, Int:D :$filter-length, Int:D :$blankvec, Num:D :@salts --> Array[Int]) {
+    my Int @cells;
+
+    for @salts -> $salt {
+        my Int $vec = $blankvec;
+        my Int @pieces = sha1($key ~ $salt).unpack('N*');
+
+        $vec = $vec +^ $_ for @pieces;
+
+        @cells.push: $vec % $filter-length; # push bit-offset
+    }
+
+    @cells;
+}
+
+method add(Mu:D: Any:D $key) {
+
+    die "Exceeded filter capacity: {$!capacity}"
+        if $!key-count >= $!capacity;
+
+    $!key-count++;
+
+    $!filter[$_] = 1 for self.get-cells(
+        $key,
+        filter-length => $!filter-length,
+        blankvec      => $!blankvec,
+        salts         => @!salts,
+    );
+}
+
+method check(Mu:D: Any:D $key) {
+    so $!filter[
+        self.get-cells(
+            $key,
+            filter-length => $!filter-length,
+            blankvec      => $!blankvec,
+            salts         => @!salts,
+        )
+    ].all === 1;
+}
+
 
 =begin pod
 
