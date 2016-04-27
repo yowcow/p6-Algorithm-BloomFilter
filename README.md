@@ -3,17 +3,28 @@
 NAME
 ====
 
-Algorithm::BloomFilter - blah blah blah
+Algorithm::BloomFilter - A bloom filter implementation in Perl 6
 
 SYNOPSIS
 ========
 
     use Algorithm::BloomFilter;
 
+    my $filter = Algorithm::BloomFilter.new(
+      capacity   => 100,
+      error-rate => 0.01,
+    );
+
+    $filter.add("foo-bar");
+
+    $filter.check("foo-bar"); # True
+
+    $filter.check("bar-foo"); # False with false-positive possibility
+
 DESCRIPTION
 ===========
 
-Algorithm::BloomFilter is ...
+Algorithm::BloomFilter is a pure Perl 6 implementation of [Bloom Filter](https://en.wikipedia.org/wiki/Bloom_filter), mostly based on [Bloom::Filter](https://metacpan.org/pod/Bloom::Filter) from Perl 5.
 
 AUTHOR
 ======

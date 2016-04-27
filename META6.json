@@ -10,7 +10,7 @@
   "depends" : [
     "Digest::SHA"
   ],
-  "description" : "Bloom filter implementation in Perl 6",
+  "description" : "A bloom filter implementation in Perl 6",
   "test-depends" : [
     "Test",
     "Test::META"

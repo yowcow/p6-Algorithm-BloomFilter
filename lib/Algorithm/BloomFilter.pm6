@@ -105,15 +105,26 @@ method check(Mu:D: Any:D $key --> Bool) {
 
 =head1 NAME
 
-Algorithm::BloomFilter - blah blah blah
+Algorithm::BloomFilter - A bloom filter implementation in Perl 6
 
 =head1 SYNOPSIS
 
   use Algorithm::BloomFilter;
 
+  my $filter = Algorithm::BloomFilter.new(
+    capacity   => 100,
+    error-rate => 0.01,
+  );
+
+  $filter.add("foo-bar");
+
+  $filter.check("foo-bar"); # True
+
+  $filter.check("bar-foo"); # False with false-positive possibility
+
 =head1 DESCRIPTION
 
-Algorithm::BloomFilter is ...
+Algorithm::BloomFilter is a pure Perl 6 implementation of L<Bloom Filter|https://en.wikipedia.org/wiki/Bloom_filter>, mostly based on L<Bloom::Filter|https://metacpan.org/pod/Bloom::Filter> from Perl 5.
 
 =head1 AUTHOR
 
