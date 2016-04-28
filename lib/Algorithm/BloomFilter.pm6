@@ -128,31 +128,37 @@ Algorithm::BloomFilter is a pure Perl 6 implementation of L<Bloom Filter|https:/
 
 =head1 METHODS
 
-=head2 new(Rat:D :$error-rate, Int:D :$capacity)
+=head3 new(Rat:D :$error-rate, Int:D :$capacity)
 
 Creates a Bloom::Filter instance.
 
-=head2 add(Cool:D $key)
+=head3 add(Cool:D $key)
 
 Adds a given key to filter instance.
 
-=head2 check(Cool:D $key) returns Bool
+=head3 check(Cool:D $key) returns Bool
 
 Checks if a given key is in filter instance.
 
 =head1 INTERNAL METHODS
 
-=head2 calculate-shortest-filter-length(Int:D :$num-keys, Rat:D $error-rate) returns Hash[Int]
+=head3 calculate-shortest-filter-length(Int:D :$num-keys, Rat:D $error-rate) returns Hash[Int]
 
 Calculates and returns filter's length and a number of hash functions.
 
-=head2 create-salts(Int:D :$count) returns Seq[Num]
+=head3 create-salts(Int:D :$count) returns Seq[Num]
 
 Creates and returns C<$count> unique and random salts.
 
-=head2 get-cells(Cool:D $key, Int:D :$filter-length, Int:D :$blankvec, Num:D :@salts) returns Array[Int]
+=head3 get-cells(Cool:D $key, Int:D :$filter-length, Int:D :$blankvec, Num:D :@salts) returns Array[Int]
 
-Calculates and returns positions in bit vector to check flags.
+Calculates and returns positions to check in a bit vector.
+
+=head1 SEE ALSO
+
+L<Bloom Filter|https://en.wikipedia.org/wiki/Bloom_filter>
+
+L<Bloom::Filter|https://metacpan.org/pod/Bloom::Filter>
 
 =head1 AUTHOR
 
