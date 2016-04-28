@@ -38,7 +38,7 @@ subtest {
     dies-ok { Algorithm::BloomFilter.add('hogehoge') };
     dies-ok { Algorithm::BloomFilter.check('hogehoge') };
 
-}, 'Test add and check are instance method';
+}, 'Test `add` and `check` are instance method';
 
 subtest {
 

@@ -48,7 +48,7 @@ method calculate-shortest-filter-length(Int:D :$num-keys, Rat:D :$error-rate -->
         num-hash-funcs => $best-k;
 }
 
-method create-salts(Int:D :$count --> Array[Num]) {
+method create-salts(Int:D :$count --> Seq) {
     my Num %collisions;
 
     while %collisions.keys.elems < $count {
@@ -56,10 +56,10 @@ method create-salts(Int:D :$count --> Array[Num]) {
         %collisions{$c} = $c;
     }
 
-    my Num @array = %collisions.values;
+    %collisions.values;
 }
 
-method get-cells(Any:D $key, Int:D :$filter-length, Int:D :$blankvec, Num:D :@salts --> Array[Int]) {
+method get-cells(Cool:D $key, Int:D :$filter-length, Int:D :$blankvec, Num:D :@salts --> Array[Int]) {
     my Int @cells;
 
     for @salts -> $salt {
@@ -74,7 +74,7 @@ method get-cells(Any:D $key, Int:D :$filter-length, Int:D :$blankvec, Num:D :@sa
     @cells;
 }
 
-method add(Mu:D: Any:D $key) {
+method add(::?CLASS:D: Cool:D $key) {
 
     die "Exceeded filter capacity: {$!capacity}"
         if $!key-count >= $!capacity;
@@ -89,7 +89,7 @@ method add(Mu:D: Any:D $key) {
     );
 }
 
-method check(Mu:D: Any:D $key --> Bool) {
+method check(::?CLASS:D: Cool:D $key --> Bool) {
     so $!filter[
         self.get-cells(
             $key,
@@ -120,11 +120,39 @@ Algorithm::BloomFilter - A bloom filter implementation in Perl 6
 
   $filter.check("foo-bar"); # True
 
-  $filter.check("bar-foo"); # False with false-positive possibility
+  $filter.check("bar-foo"); # False with possible false-positive
 
 =head1 DESCRIPTION
 
 Algorithm::BloomFilter is a pure Perl 6 implementation of L<Bloom Filter|https://en.wikipedia.org/wiki/Bloom_filter>, mostly based on L<Bloom::Filter|https://metacpan.org/pod/Bloom::Filter> from Perl 5.
+
+=head1 METHODS
+
+=head2 new(Rat:D :$error-rate, Int:D :$capacity)
+
+Creates a Bloom::Filter instance.
+
+=head2 add(Cool:D $key)
+
+Adds a given key to filter instance.
+
+=head2 check(Cool:D $key) returns Bool
+
+Checks if a given key is in filter instance.
+
+=head1 INTERNAL METHODS
+
+=head2 calculate-shortest-filter-length(Int:D :$num-keys, Rat:D $error-rate) returns Hash[Int]
+
+Calculates and returns filter's length and a number of hash functions.
+
+=head2 create-salts(Int:D :$count) returns Seq[Num]
+
+Creates and returns C<$count> unique and random salts.
+
+=head2 get-cells(Cool:D $key, Int:D :$filter-length, Int:D :$blankvec, Num:D :@salts) returns Array[Int]
+
+Calculates and returns positions in bit vector to check flags.
 
 =head1 AUTHOR
 
