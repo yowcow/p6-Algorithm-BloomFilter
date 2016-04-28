@@ -10,8 +10,8 @@ has Int $.key-count;
 has Int $.filter-length;
 has Int $.num-hash-funcs;
 has Num @.salts;
-has Buf $.filter;
-has Int $.blankvec;
+has Buf $!filter;
+has Int $!blankvec;
 
 method BUILD(Rat:D :$!error-rate, Int:D :$!capacity) {
     my %filter-settings = self.calculate-shortest-filter-length(

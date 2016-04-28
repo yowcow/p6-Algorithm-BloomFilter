@@ -26,8 +26,6 @@ subtest {
         is $bloom.filter-length,  49;
         is $bloom.num-hash-funcs, 3;
         is $bloom.salts.elems,    3;
-        is $bloom.filter.elems,   49;
-        is $bloom.blankvec,       0;
 
     }, 'Succeeds with valid parameters';
 
@@ -44,7 +42,7 @@ subtest {
 
     my Algorithm::BloomFilter $bloom .= new(
         error-rate => 0.01,
-        capacity   => 2,
+        capacity   => 100,
     );
 
     lives-ok { $bloom.add('hogehoge') };
