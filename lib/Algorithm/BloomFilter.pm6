@@ -157,7 +157,7 @@ Calculates and returns filter's length and a number of hash functions.
 
 Creates and returns C<$count> unique and random salts.
 
-=head3 get-cells(Cool:D $key, Int:D :$filter-length, Int:D :$blankvec, Num:D :@salts) returns Array[Int]
+=head3 get-cells(Cool:D $key, Int:D :$filter-length, Int:D :$blankvec, Num:D :@salts) returns List
 
 Calculates and returns positions to check in a bit vector.
 
