@@ -10,8 +10,10 @@ has Int $.key-count;
 has Int $.filter-length;
 has Int $.num-hash-funcs;
 has Num @.salts;
-has Buf $!filter;
+has Int @!filters;
 has Int $!blankvec;
+
+constant FILTER_BITS = 64;
 
 method BUILD(Rat:D :$!error-rate, Int:D :$!capacity) {
     my %filter-settings = self.calculate-shortest-filter-length(
@@ -24,7 +26,8 @@ method BUILD(Rat:D :$!error-rate, Int:D :$!capacity) {
     @!salts          = self.create-salts(count => $!num-hash-funcs);
 
     # Create an empty filter
-    $!filter = Buf.new((for 1 .. $!filter-length { 0 }));
+    0 .. ($!filter-length / FILTER_BITS).floor
+        ==> map { @!filters[$_] = 0 };
 
     # Create a blank vector
     $!blankvec = 0;
@@ -59,7 +62,7 @@ method create-salts(Int:D :$count --> Seq) {
     %collisions.values;
 }
 
-method get-cells(Cool:D $key, Int:D :$filter-length, Int:D :$blankvec, Num:D :@salts --> Array[Int]) {
+method get-cells(Cool:D $key, Int:D :$filter-length, Int:D :$blankvec, Num:D :@salts --> List) {
     my Int @cells;
 
     for @salts -> $salt {
@@ -71,7 +74,7 @@ method get-cells(Cool:D $key, Int:D :$filter-length, Int:D :$blankvec, Num:D :@s
         @cells.push: $vec % $filter-length; # push bit-offset
     }
 
-    @cells;
+    |@cells;
 }
 
 method add(::?CLASS:D: Cool:D $key) {
@@ -81,23 +84,27 @@ method add(::?CLASS:D: Cool:D $key) {
 
     $!key-count++;
 
-    $!filter[$_] = 1 for self.get-cells(
+    self.get-cells(
         $key,
         filter-length => $!filter-length,
         blankvec      => $!blankvec,
         salts         => @!salts,
-    );
+    ) ==> map {
+        my Int $i = ($_ / FILTER_BITS).floor;
+        @!filters[$i] = @!filters[$i] +| 2 ** ($_ % FILTER_BITS);
+    };
 }
 
 method check(::?CLASS:D: Cool:D $key --> Bool) {
-    so $!filter[
-        self.get-cells(
-            $key,
-            filter-length => $!filter-length,
-            blankvec      => $!blankvec,
-            salts         => @!salts,
-        )
-    ].all === 1;
+    so (self.get-cells(
+        $key,
+        filter-length => $!filter-length,
+        blankvec      => $!blankvec,
+        salts         => @!salts,
+    ) ==> map {
+        my Int $i = ($_ / FILTER_BITS).floor;
+        @!filters[$i] +& 2 ** ($_ % FILTER_BITS);
+    }).all;
 }
 
 
