@@ -4,7 +4,7 @@
   ],
   "build-depends" : [ ],
   "depends" : [
-    "Digest::SHA"
+    "Digest::MurmurHash3"
   ],
   "description" : "A bloom filter implementation in Perl 6",
   "name" : "Algorithm::BloomFilter",
@@ -18,5 +18,5 @@
     "Test",
     "Test::META"
   ],
-  "version" : "0.0.2"
+  "version" : "0.1.0"
 }
