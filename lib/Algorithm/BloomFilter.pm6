@@ -1,6 +1,6 @@
 use v6;
 use experimental :pack;
-use Digest::SHA;
+use Digest::MurmurHash3;
 
 unit class Algorithm::BloomFilter;
 
@@ -9,11 +9,12 @@ has Int $.capacity;
 has Int $.key-count;
 has Int $.filter-length;
 has Int $.num-hash-funcs;
-has Num @.salts;
+has Int @.salts;
 has Int @!filters;
 has Int $!blankvec;
 
 constant FILTER_BITS = 64;
+constant UINT32_MAX  = 4294967295;
 
 method BUILD(Rat:D :$!error-rate, Int:D :$!capacity) {
     my %filter-settings = self.calculate-shortest-filter-length(
@@ -52,22 +53,22 @@ method calculate-shortest-filter-length(Int:D :$num-keys, Rat:D :$error-rate -->
 }
 
 method create-salts(Int:D :$count --> Seq) {
-    my Num %collisions;
+    my Int %collisions;
 
     while %collisions.keys.elems < $count {
-        my Num $c = rand;
+        my Int $c = UINT32_MAX.rand +& UINT32_MAX;
         %collisions{$c} = $c;
     }
 
     %collisions.values;
 }
 
-method get-cells(Cool:D $key, Int:D :$filter-length, Int:D :$blankvec, Num:D :@salts --> List) {
+method get-cells(Cool:D $key, Int:D :$filter-length, Int:D :$blankvec, Int:D :@salts --> List) {
     my Int @cells;
 
     for @salts -> $salt {
         my Int $vec = $blankvec;
-        my Int @pieces = sha1($key ~ $salt).unpack('N*');
+        my Int @pieces = murmurhash3_128(~$key, $salt);
 
         $vec = $vec +^ $_ for @pieces;
 
@@ -133,6 +134,8 @@ Algorithm::BloomFilter - A bloom filter implementation in Perl 6
 
 Algorithm::BloomFilter is a pure Perl 6 implementation of L<Bloom Filter|https://en.wikipedia.org/wiki/Bloom_filter>, mostly based on L<Bloom::Filter|https://metacpan.org/pod/Bloom::Filter> from Perl 5.
 
+Digest::MurmurHash3 is used for hashing from version 0.1.0.
+
 =head1 METHODS
 
 =head3 new(Rat:D :$error-rate, Int:D :$capacity)
@@ -153,11 +156,11 @@ Checks if a given key is in filter instance.
 
 Calculates and returns filter's length and a number of hash functions.
 
-=head3 create-salts(Int:D :$count) returns Seq[Num]
+=head3 create-salts(Int:D :$count) returns Seq[Int]
 
-Creates and returns C<$count> unique and random salts.
+Creates and returns C<$count> unique and random uint32 salts.
 
-=head3 get-cells(Cool:D $key, Int:D :$filter-length, Int:D :$blankvec, Num:D :@salts) returns List
+=head3 get-cells(Cool:D $key, Int:D :$filter-length, Int:D :$blankvec, Int:D :@salts) returns List
 
 Calculates and returns positions to check in a bit vector.
 
