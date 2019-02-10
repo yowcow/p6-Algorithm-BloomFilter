@@ -6,6 +6,5 @@ services:
 install:
   - docker pull jjmerelo/test-perl6
   - docker images
-  - docker run -t --entrypoint="/bin/sh" jjmerelo/test-perl6  -c "apk add --update --no-cache openssl-dev make"
   
-script: docker run -t  --entrypoint="/bin/sh" -v  $TRAVIS_BUILD_DIR:/test jjmerelo/test-perl6 "apk add --update --no-cache openssl-dev make && zef install --deps-only . && zef test ."
+script: docker run -t  --entrypoint="/bin/sh" -v  $TRAVIS_BUILD_DIR:/test jjmerelo/test-perl6 -c "apk add --update --no-cache openssl-dev make && zef install --deps-only . && zef test ."
