@@ -14,7 +14,7 @@
     "Algorithm::BloomFilter" : "lib/Algorithm/BloomFilter.pm6"
   },
   "resources" : [ ],
-  "source-url" : "git@github.com:yowcow/p6-Algorithm-BloomFilter.git",
+  "source-url" : "https://github.com/yowcow/p6-Algorithm-BloomFilter.git",
   "test-depends" : [
     "Test",
     "Test::META"
